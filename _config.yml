@@ -25,10 +25,10 @@ author:
   name             : "David Guo"
   pronouns         : # example: "she/her"  
   bio              : "Short biography for the left-hand sidebar"
-  location         : "Earth"
-  employer         : "Red Brick University"
+  location         : "Fry Building, Woodland Road, Bristol, BS8 1UG"
+  employer         : "University of Bristol"
   uri              : # URL
-  email            : "none@example.org" 
+  email            : "h.guo@bristol.ac.uk" 
 
   # Academic websites
   arxiv            : # URL - Update with the correct link to your profile
