@@ -21,7 +21,7 @@ repository               : "https://ghc-1997.github.io/dguo/"
 #               Additional customization can be done by editing /_includes/author-profile.html
 author:
   # Biographic information
-  avatar           : "images/profile.jpg"
+  avatar           : "david_photo.png"
   name             : "David Guo"
   pronouns         : # example: "she/her"  
   bio              : "Short biography for the left-hand sidebar"
