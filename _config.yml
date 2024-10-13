@@ -24,8 +24,8 @@ author:
   avatar           : "david_photo.png"
   name             : "David Guo"
   pronouns         : # example: "she/her"  
-  bio              : "Short biography for the left-hand sidebar"
-  location         : "Fry Building, Woodland Road, Bristol, BS8 1UG"
+  bio              : 
+  location         : 
   employer         : "University of Bristol"
   uri              : # URL
   email            : "h.guo@bristol.ac.uk" 
