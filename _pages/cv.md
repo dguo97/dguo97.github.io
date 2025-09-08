@@ -1,7 +1,47 @@
+
+
 ---
 layout: archive
-title: "Programming"
+title:  <b>Programming:</b>
 permalink: /programming/
-author_profile: true
+author_profile: false
 
-Here are some of the programming projects I created:
+---
+
+ <p>
+       
+        
+            
+     <ul>
+     <ul>
+  <li>
+<div> <i> Residually finite groups with uniformly almost flat quotients </i> 
+ <div>Joint with Matthew Tointon 
+<div>35 pages. <a href="https://arxiv.org/abs/2410.23035"><tt>arxiv:2410.23035</tt></a>.
+ <div> To appear in  Advances in Mathematics
+ <br>
+
+       <li>
+<div> <i> The Conjugacy Ratio of Abelian-by-ℤ Groups </i> 
+<div>15 pages. <a href="https://arxiv.org/abs/2410.23034"><tt>arxiv:2410.23034</tt></a>.
+   <div>      To appear in  Proceedings of the Edinburgh Mathematical Society
+           
+            
+            
+         <ul>
+        
+    </p>
+
+
+          <div style="position: relative">
+              <i> <p style="position: fixed; bottom: 0; right: 20px; text-align: centre">   &ldquo; It is a privilege to study God's wisdom in creation,  <br> using the minds He blessed us with.&rdquo; </i>  
+                </p>
+<!-- 
+<div id="quote"> <i>&ldquo; It is a privilege to study God's wisdom in creation, using the mind He has blessed us with.&rdquo;</i> <br> <span style="display:inline-block;text-indent:20px"> 
+  <div style="position: relative;background-color: blue; width: 600px; height: 800px;">    
+
+    <div style="position: absolute; bottom: 5px; background-color: green">
+    It is a privilege to study God's wisdom in creation, using the mind He has blessed us with.
+    </div>
+</div>
+-->
