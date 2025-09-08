@@ -8,11 +8,14 @@ main:
   - title: "Publications"
     url: /publications/
 
+
+ - title: "Programming"
+    url: /programming/    
+    
 #  - title: "Talks"
 #    url: /talks/    
 
-  - title: "Programming"
-    url: /programming/    
+
     
     
 #  - title: "CV"
