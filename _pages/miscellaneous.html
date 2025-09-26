@@ -81,7 +81,9 @@ permalink: /miscellaneous/
         background-color: #1f618d;
     }
 
+    /* Quote styles */
     .quote {
+        position: relative;
         text-align: center;
         font-style: italic;
         margin: 40px auto;
@@ -90,16 +92,96 @@ permalink: /miscellaneous/
         background-color: #eaf2f8;
         padding: 20px;
         border-radius: 10px;
+        overflow: hidden;
+        transition: color 0.5s ease, background-color 0.5s ease, box-shadow 0.5s ease;
     }
 
+    /* Image behind quote */
+    .quote::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://dguo97.github.io/Woodlands_ChurchGod_loves_you.png');
+        background-size: cover;
+        background-position: center;
+        border-radius: 10px;
+        opacity: 0;
+        transform: scale(0.98);
+        transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+        z-index: 0;
+    }
+
+    /* Overlay */
+    .quote::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.3);
+        border-radius: 10px;
+        opacity: 0;
+        transition: opacity 0.5s ease, background-color 0.5s ease;
+        z-index: 1;
+    }
+
+    /* Floating animation for text */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    /* Glow pulse with color shift */
+    @keyframes glowPulseColor {
+        0%,100% { text-shadow: 1px 1px 3px rgba(0,0,0,0.2), 0 0 8px rgba(255,255,255,0.3); }
+        50% { text-shadow: 1px 1px 3px rgba(0,0,0,0.2), 0 0 15px rgba(173,216,230,0.6); }
+    }
+
+    .quote span {
+        position: relative;
+        z-index: 2;
+        display: inline-block;
+        transition: transform 0.3s ease 0s, opacity 0.5s ease 0.2s;
+        animation: float 3s ease-in-out infinite, glowPulseColor 2s ease-in-out infinite;
+    }
+
+    /* Hover effects */
+    .quote:hover span {
+        transform: scale(1.1);
+        opacity: 0;
+        animation: none;
+    }
+
+    .quote:hover::after {
+        opacity: 1;
+        transform: scale(1.05);
+        filter: brightness(1.05);
+    }
+
+    .quote:hover::before {
+        opacity: 1;
+        background-color: rgba(0,0,0,0.15);
+    }
+
+    .quote:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
     @media (max-width: 650px) {
         .activity {
             flex-direction: column;
             align-items: center;
         }
-
         .activity img {
             width: 90%;
+        }
+        .quote {
+            max-width: 90%;
         }
     }
 </style>
@@ -112,7 +194,7 @@ permalink: /miscellaneous/
         <div class="activity-text">
             <h2><span>🏃‍♂️</span> Saturdays – Eastville parkrun</h2>
             <p>
-On Saturdays, I am a regular attendee of <a href="https://www.parkrun.org.uk/eastville/" target="_blank"> Eastville parkrun</a> and currently on my journey towards the 50-volunteer milestone t-shirt. <br>
+                On Saturdays, I am a regular attendee of <a href="https://www.parkrun.org.uk/eastville/" target="_blank">Eastville parkrun</a> and currently on my journey towards the 50-volunteer milestone t-shirt.<br>
                 <a href="https://www.parkrun.org.uk/register/" target="_blank" class="button">Join parkrun</a>
             </p>
             <p>
@@ -137,111 +219,8 @@ On Saturdays, I am a regular attendee of <a href="https://www.parkrun.org.uk/eas
         <img src="https://dguo97.github.io/Woodlands_Church.jpg" alt="Woodlands Church Bristol">
     </div>
 
-.quote {
-    position: relative;
-    text-align: center;
-    font-style: italic;
-    margin: 40px auto;
-    max-width: 600px;
-    color: #555;
-    background-color: #f4f7f8;
-    padding: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: color 0.5s ease, background-color 0.5s ease, box-shadow 0.5s ease;
-}
-
-/* Image pseudo-element */
-.quote::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('https://dguo97.github.io/Woodlands_ChurchGod_loves_you.png');
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    opacity: 0;
-    transform: scale(0.98); /* tiny pop scale */
-    transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
-    z-index: 0;
-}
-
-/* Overlay */
-.quote::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 10px;
-    opacity: 0;
-    transition: opacity 0.5s ease, background-color 0.5s ease;
-    z-index: 1;
-}
-
-/* Floating animation for text */
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-/* Glow pulse with color shift */
-@keyframes glowPulseColor {
-    0%, 100% { 
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.2), 0 0 8px rgba(255,255,255,0.3); 
-    }
-    50% { 
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.2), 0 0 15px rgba(173, 216, 230,0.6); /* soft blue-white glow */
-    }
-}
-
-/* Text inside the quote */
-.quote span {
-    position: relative;
-    z-index: 2;
-    display: inline-block;
-    transition: transform 0.3s ease 0s, opacity 0.5s ease 0.2s;
-    animation: float 3s ease-in-out infinite, glowPulseColor 2s ease-in-out infinite;
-}
-
-/* Hover effects */
-.quote:hover span {
-    transform: scale(1.1); /* bounce */
-    opacity: 0; /* fade out */
-    animation: none; /* stop floating and glowing */
-}
-
-.quote:hover::after {
-    opacity: 1;             
-    transform: scale(1.05); /* zoom + pop */
-    filter: brightness(1.05); /* brighten image */
-}
-
-.quote:hover::before {
-    opacity: 1; 
-    background-color: rgba(0,0,0,0.15); /* overlay lightens */
-}
-
-.quote:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
-
-/* Responsive for smaller screens */
-@media (max-width: 650px) {
-    .quote {
-        max-width: 90%;
-    }
-}
-</style>
-</head>
-<body>
-    
+    <!-- Magical Quote -->
     <div class="quote">
-        “When we offer the little we have, God can bless it and transform it into something incredible.”
+        <span>“When we offer the little we have, God can bless it and transform it into something incredible.”</span>
     </div>
 </div>
