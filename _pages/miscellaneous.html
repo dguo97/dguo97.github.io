@@ -81,9 +81,8 @@ permalink: /miscellaneous/
         background-color: #1f618d;
     }
 
-    /* Quote styles */
+    /* Quote section with image below */
     .quote {
-        position: relative;
         text-align: center;
         font-style: italic;
         margin: 40px auto;
@@ -92,70 +91,26 @@ permalink: /miscellaneous/
         background-color: #eaf2f8;
         padding: 20px;
         border-radius: 10px;
-        overflow: hidden;
-        transition: color 0.5s ease, background-color 0.5s ease, box-shadow 0.5s ease;
+        transition: box-shadow 0.5s ease;
     }
 
-    /* Image behind quote */
-    .quote::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
+    .quote img.quote-img {
         width: 100%;
-        height: 100%;
-        background-image: url('https://dguo97.github.io/God_loves_you.jpg');
-        background-size: cover;
-        background-position: center;
+        display: block;
+        margin-top: 20px;
+        opacity: 0;
+        transition: opacity 0.5s ease;
         border-radius: 10px;
-        opacity: 0;
-        transform: scale(0.98);
-        transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
-        z-index: 0;
-    }
-
-    /* Overlay */
-    .quote::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.3);
-        border-radius: 10px;
-        opacity: 0;
-        transition: opacity 0.5s ease, background-color 0.5s ease;
-        z-index: 1;
-    }
-
-
-
-   
-
-    /* Hover effects */
-    .quote:hover span {
-        transform: scale(1.1);
-        opacity: 0;
-        animation: none;
-    }
-
-    .quote:hover::after {
-        opacity: 1;
-        transform: scale(1.05);
-        filter: brightness(1.05);
-    }
-
-    .quote:hover::before {
-        opacity: 1;
-        background-color: rgba(0,0,0,0.15);
     }
 
     .quote:hover {
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
-    /* Responsive */
+    .quote:hover img.quote-img {
+        opacity: 1;
+    }
+
     @media (max-width: 650px) {
         .activity {
             flex-direction: column;
@@ -203,8 +158,9 @@ permalink: /miscellaneous/
         <img src="https://dguo97.github.io/Woodlands_Church.jpg" alt="Woodlands Church Bristol">
     </div>
 
-    <!-- Magical Quote -->
+    <!-- Static Quote with full image below and line break -->
     <div class="quote">
-        <span>“When we offer the little we have, God can bless it and transform it into something incredible.”</span>
+        “When we offer the little we have, God can bless it and<br>transform it into something incredible.”
+        <img class="quote-img" src="https://dguo97.github.io/God_loves_you.png" alt="God loves you">
     </div>
 </div>
