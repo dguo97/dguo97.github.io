@@ -100,24 +100,10 @@ h2 span {
 }
 
 .hover-table-trigger:hover {
-    text-shadow: 0 0 10px #ffeb3b; /* yellow glow */
+    text-shadow: 0 0 10px #ff0000; /* red glow */
 }
 
 /* Parkrun table styling */
-#parkrun-table-container {
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    max-width: 90vw;
-    max-height: 70vh;
-    overflow: auto;
-    position: absolute;
-    background: #fff9c4;
-    border: 2px solid #fbc02d;
-    padding: 15px;
-    z-index: 1000;
-    display: none;
-}
-
 #parkrun-table-container table {
     width: 100%;
     border-collapse: collapse;
@@ -133,16 +119,21 @@ h2 span {
 }
 
 #parkrun-table-container th {
-    background-color: #fdd835;
+    background-color: #fdd835; /* soft yellow header */
     color: #333;
 }
 
 #parkrun-table-container tr:nth-child(even) {
-    background-color: #fff8e1;
+    background-color: #fff8e1; /* alternating row color */
 }
 
 #parkrun-table-container tr:hover {
-    background-color: #ffe082;
+    background-color: #ffe082; /* highlight on hover */
+}
+
+#parkrun-table-container {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* Quote Section */
@@ -191,7 +182,7 @@ h2 span {
     border: none;
     padding: 12px 28px;
     border-radius: 12px;
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-size: 1.1rem;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
 }
@@ -248,8 +239,8 @@ h2 span {
         <img src="https://dguo97.github.io/Eastville_parkrun.jpg" alt="Eastville parkrun start line">
     </div>
 
-    <!-- Parkrun table container -->
-    <div id="parkrun-table-container">
+    <!-- Hidden container for volunteer table -->
+    <div id="parkrun-table-container" style="display:none; position:absolute; background:#fff9c4; border:2px solid #fbc02d; padding:15px; z-index:1000;">
         <h3>Volunteer Summary — David GUO</h3>
         <div id="table-wrap"><p>Loading…</p></div>
         <div id="last-updated"></div>
@@ -327,37 +318,25 @@ document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
             `Last updated: ${day}/${month}/${year}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
     }
 
-    function positionContainer(e) {
-        let top = e.pageY + 10;
-        let left = e.pageX + 10;
-
-        const rect = container.getBoundingClientRect();
-        if (top + rect.height > window.innerHeight + window.scrollY) {
-            top = window.innerHeight + window.scrollY - rect.height - 10;
-        }
-        if (left + rect.width > window.innerWidth + window.scrollX) {
-            left = window.innerWidth + window.scrollX - rect.width - 10;
-        }
-
-        container.style.top = top + 'px';
-        container.style.left = left + 'px';
-    }
-
-    trigger.addEventListener('mouseenter', e => {
-        container.style.display = 'block';
-        positionContainer(e);
+    trigger.addEventListener('mouseenter', e=>{
+        container.style.display='block';
+        container.style.top=(e.pageY+10)+'px';
+        container.style.left=(e.pageX+10)+'px';
         fetch('https://dguo97.github.io/data/parkrun.json')
-            .then(res => res.json()).then(json => renderTable(json))
-            .catch(err => {
-                console.warn('Failed to fetch JSON.', err);
+            .then(res=>res.json()).then(json=>renderTable(json))
+            .catch(err=>{
+                console.warn('Failed to fetch JSON.',err);
                 document.getElementById('table-wrap').innerHTML='<p>Error loading data.</p>';
                 document.getElementById('last-updated').textContent='';
             });
     });
 
-    trigger.addEventListener('mousemove', positionContainer);
+    trigger.addEventListener('mousemove', e=>{
+        container.style.top=(e.pageY+10)+'px';
+        container.style.left=(e.pageX+10)+'px';
+    });
 
-    trigger.addEventListener('mouseleave', () => { container.style.display = 'none'; });
+    trigger.addEventListener('mouseleave', ()=>{ container.style.display='none'; });
 });
 
 // Quote confetti interaction
