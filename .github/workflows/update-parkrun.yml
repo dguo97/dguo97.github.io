@@ -1,0 +1,34 @@
+name: Update Parkrun Volunteer Data
+
+on:
+  schedule:
+    - cron: '0 12 * * 6' # Saturday 12:00 UTC
+    - cron: '0 12 * * 0' # Sunday 12:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch Parkrun Data
+        run: |
+          mkdir -p data
+          # Example placeholder: replace with real parsing if needed
+          echo '{
+            "source": "parkrun 2305995",
+            "lastUpdated": "'"$(date --utc +'%Y-%m-%d %H:%M:%S UTC')"'" ,
+            "data": [
+              {"role": "Run Director", "occasions": 5},
+              {"role": "Marshal", "occasions": 12}
+            ]
+          }' > data/parkrun.json
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/parkrun.json
+          git commit -m "Update parkrun volunteer data" || echo "No changes"
+          git push
