@@ -178,20 +178,92 @@ h2 span {
     <h1>Bristol Activities</h1>
 
     <!-- Saturdays - Eastville parkrun -->
-    <div class="activity">
-        <div class="activity-text">
-            <h2><span>🏃‍♂️</span> Saturdays – Eastville parkrun</h2>
-            <p>
-                On Saturdays, I am a regular attendee of <a href="https://www.parkrun.org.uk/eastville/" target="_blank">Eastville parkrun</a> and currently on my journey towards the 50-volunteer milestone t-shirt.<br>
-                <a href="https://www.parkrun.org.uk/register/" target="_blank" class="button">Join Eastville parkrun</a>
-            </p>
-            <p>
-                parkrun is a free, community event where people can walk, jog, run, volunteer, or spectate. 
-                It’s a 5k that takes place every Saturday morning. parkrun is positive, welcoming, and inclusive—no time limit, and no one ever finishes last. Everyone is welcome.
-            </p>
-        </div>
-        <img src="https://dguo97.github.io/Eastville_parkrun.jpg" alt="Eastville parkrun start line">
+---
+layout: default
+title: Volunteer Summary
+permalink: /parkrun-volunteer/
+---
+
+<div class="activity">
+    <div class="activity-text">
+        <h2><span>🏃‍♂️</span> Saturdays – Eastville parkrun</h2>
+        <p>
+            On Saturdays, I am a regular attendee of 
+            <a href="https://www.parkrun.org.uk/eastville/" target="_blank">Eastville parkrun</a> 
+            and currently on my journey towards the 
+            <span class="hover-table-trigger" style="text-decoration: underline; cursor: pointer;">50-volunteer milestone t-shirt</span>.
+            <br>
+            <a href="https://www.parkrun.org.uk/register/" target="_blank" class="button">Join parkrun</a>
+        </p>
+        <p>
+            parkrun is a free, community event where people can walk, jog, run, volunteer, or spectate. 
+            It’s a 5k that takes place every Saturday morning. parkrun is positive, welcoming, and inclusive—no time limit, and no one ever finishes last. Everyone is welcome.
+        </p>
     </div>
+    <img src="https://dguo97.github.io/Eastville_parkrun.jpg" alt="Eastville parkrun start line">
+</div>
+
+<!-- Hidden container for volunteer table -->
+<div id="parkrun-table-container" style="
+    display: none;
+    position: absolute;
+    background: #fff9c4;
+    border: 2px solid #fbc02d;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+">
+    <h3>Volunteer Summary — David GUO</h3>
+    <div id="table-wrap"><p>Loading…</p></div>
+    <div id="last-updated"></div>
+</div>
+
+<script>
+const trigger = document.querySelector('.hover-table-trigger');
+const container = document.getElementById('parkrun-table-container');
+
+function renderTable(json) {
+  const rows = json.data.filter(r => r.role !== "Total Credits"); // optional: hide Total Credits
+  let html = '<table><thead><tr><th>Role</th><th>Occasions</th></tr></thead><tbody>';
+  rows.forEach(r => {
+    html += `<tr><td>${r.role}</td><td>${r.occasions}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('table-wrap').innerHTML = html;
+  document.getElementById('last-updated').textContent = `Source: ${json.source}, updated ${json.lastUpdated}`;
+}
+
+trigger.addEventListener('mouseenter', (e) => {
+  container.style.display = 'block';
+  container.style.top = (e.pageY + 10) + 'px';
+  container.style.left = (e.pageX + 10) + 'px';
+
+  // Fetch JSON from external source
+  if (!container.dataset.loaded) {
+    fetch('https://dguo97.github.io/data/parkrun.json')
+      .then(res => res.json())
+      .then(json => {
+        renderTable(json);
+        container.dataset.loaded = "true";
+      })
+      .catch(err => {
+        console.warn('Failed to fetch JSON, using fallback data.', err);
+        renderTable(fallbackData);
+        container.dataset.loaded = "true";
+      });
+  }
+});
+
+trigger.addEventListener('mousemove', (e) => {
+  container.style.top = (e.pageY + 10) + 'px';
+  container.style.left = (e.pageX + 10) + 'px';
+});
+
+trigger.addEventListener('mouseleave', () => {
+  container.style.display = 'none';
+});
+</script>
+
 
     <!-- Sundays - Woodlands Church -->
     <div class="activity">
