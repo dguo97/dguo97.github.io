@@ -191,7 +191,7 @@ permalink: /parkrun-volunteer/
             On Saturdays, I am a regular attendee of 
             <a href="https://www.parkrun.org.uk/eastville/" target="_blank">Eastville parkrun</a> 
             and currently on my journey towards the 
-            <span class="hover-table-trigger" style="text-decoration: underline; cursor: pointer;">50-volunteer milestone t-shirt</span>.
+            <span class="hover-table-trigger">50-volunteer milestone t-shirt</span>.
             <br>
             <a href="https://www.parkrun.org.uk/register/" target="_blank" class="button">Join parkrun</a>
         </p>
@@ -218,18 +218,48 @@ permalink: /parkrun-volunteer/
     <div id="last-updated"></div>
 </div>
 
+<style>
+.hover-table-trigger {
+    text-decoration: underline;
+    cursor: pointer;
+    transition: text-shadow 0.3s ease;
+}
+
+.hover-table-trigger:hover {
+    text-shadow: 0 0 10px #ff0000; /* soft red glow */
+}
+</style>
+
 <script>
 const trigger = document.querySelector('.hover-table-trigger');
 const container = document.getElementById('parkrun-table-container');
 
 function renderTable(json) {
-  const rows = json.data.filter(r => r.role !== "Total Credits"); // optional: hide Total Credits
+  // Always include Total Credits
+  let total = json.data.reduce((sum, r) => sum + r.occasions, 0);
+  if (!json.data.some(r => r.role === "Total Credits")) {
+    json.data.push({ role: "Total Credits", occasions: total });
+  }
+
+  // Build table
   let html = '<table><thead><tr><th>Role</th><th>Occasions</th></tr></thead><tbody>';
-  rows.forEach(r => {
+  json.data.forEach(r => {
     html += `<tr><td>${r.role}</td><td>${r.occasions}</td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('table-wrap').innerHTML = html;
+
+  // Format lastUpdated to DD/MM/YYYY HH:MM with extra space
+  const dateObj = new Date(json.lastUpdated);
+  const day = String(dateObj.getUTCDate()).padStart(2, '0');
+  const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+  const year = dateObj.getUTCFullYear();
+  const hours = String(dateObj.getUTCHours()).padStart(2, '0');
+  const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
+
+  // Extra spacing between date and time using non-breaking spaces
+  document.getElementById('last-updated').innerHTML = 
+      `Last updated: ${day}/${month}/${year}&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
 }
 
 trigger.addEventListener('mouseenter', (e) => {
@@ -237,20 +267,15 @@ trigger.addEventListener('mouseenter', (e) => {
   container.style.top = (e.pageY + 10) + 'px';
   container.style.left = (e.pageX + 10) + 'px';
 
-  // Fetch JSON from external source
-  if (!container.dataset.loaded) {
-    fetch('https://dguo97.github.io/data/parkrun.json')
-      .then(res => res.json())
-      .then(json => {
-        renderTable(json);
-        container.dataset.loaded = "true";
-      })
-      .catch(err => {
-        console.warn('Failed to fetch JSON, using fallback data.', err);
-        renderTable(fallbackData);
-        container.dataset.loaded = "true";
-      });
-  }
+  // Fetch JSON on every hover
+  fetch('https://dguo97.github.io/data/parkrun.json')
+    .then(res => res.json())
+    .then(json => renderTable(json))
+    .catch(err => {
+      console.warn('Failed to fetch JSON.', err);
+      document.getElementById('table-wrap').innerHTML = '<p>Error loading data.</p>';
+      document.getElementById('last-updated').textContent = '';
+    });
 });
 
 trigger.addEventListener('mousemove', (e) => {
@@ -262,6 +287,7 @@ trigger.addEventListener('mouseleave', () => {
   container.style.display = 'none';
 });
 </script>
+
 
 
     <!-- Sundays - Woodlands Church -->
