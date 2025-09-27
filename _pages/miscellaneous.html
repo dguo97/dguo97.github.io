@@ -230,7 +230,6 @@ function renderTable(json) {
   });
   html += '</tbody></table>';
   document.getElementById('table-wrap').innerHTML = html;
-  document.getElementById('last-updated').textContent = `Source: ${json.source}, updated ${json.lastUpdated}`;
 }
 
 trigger.addEventListener('mouseenter', (e) => {
