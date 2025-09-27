@@ -2,8 +2,8 @@ name: Update Parkrun Volunteer Data
 
 on:
   schedule:
-    - cron: '0 12 * * 6' # Saturday 12:00 UTC
-    - cron: '0 12 * * 0' # Sunday 12:00 UTC
+    - cron: '0 12 * * 6'
+    - cron: '0 12 * * 0'
   workflow_dispatch:
 
 jobs:
@@ -12,18 +12,48 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Fetch Parkrun Data
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Fetch and parse Parkrun data
         run: |
-          mkdir -p data
-          # Example placeholder: replace with real parsing if needed
-          echo '{
-            "source": "parkrun 2305995",
-            "lastUpdated": "'"$(date --utc +'%Y-%m-%d %H:%M:%S UTC')"'" ,
-            "data": [
-              {"role": "Run Director", "occasions": 5},
-              {"role": "Marshal", "occasions": 12}
-            ]
-          }' > data/parkrun.json
+          pip install requests beautifulsoup4
+          python - <<'EOF'
+          import requests
+          from bs4 import BeautifulSoup
+          import json
+          from datetime import datetime
+
+          url = "https://www.parkrun.org.uk/parkrunner/2305995/"
+          r = requests.get(url)
+          soup = BeautifulSoup(r.text, "html.parser")
+
+          table = soup.select_one("table#volunteer-history")
+          data = []
+          total_credits = 0
+          if table:
+              rows = table.select("tbody tr")
+              for row in rows:
+                  cols = row.find_all("td")
+                  role = cols[0].text.strip()
+                  occasions = int(cols[1].text.strip())
+                  data.append({"role": role, "occasions": occasions})
+                  total_credits += occasions
+
+          # Add total row
+          data.append({"role": "Total Credits", "occasions": total_credits})
+
+          result = {
+              "source": "parkrun 2305995",
+              "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+              "data": data
+          }
+
+          with open("data/parkrun.json", "w") as f:
+              json.dump(result, f, indent=2)
+          EOF
 
       - name: Commit and push
         run: |
