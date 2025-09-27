@@ -322,7 +322,7 @@ document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
         container.style.display='block';
         container.style.top=(e.pageY+10)+'px';
         container.style.left=(e.pageX+10)+'px';
-        fetch('/data/parkrun.json')
+        fetch('https://dguo97.github.io/data/parkrun.json')
             .then(res=>res.json()).then(json=>renderTable(json))
             .catch(err=>{
                 console.warn('Failed to fetch JSON.',err);
