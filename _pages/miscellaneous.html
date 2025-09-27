@@ -93,49 +93,6 @@ h2 span {
     }
 }
 
-.hover-table-trigger {
-    text-decoration: underline;
-    cursor: pointer;
-    transition: text-shadow 0.3s ease;
-}
-
-.hover-table-trigger:hover {
-    text-shadow: 0 0 10px #ff0000; /* red glow */
-}
-
-/* Parkrun table styling */
-#parkrun-table-container table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Arial', sans-serif;
-    margin-top: 10px;
-}
-
-#parkrun-table-container th,
-#parkrun-table-container td {
-    border: 1px solid #fbc02d;
-    padding: 8px 12px;
-    text-align: left;
-}
-
-#parkrun-table-container th {
-    background-color: #fdd835; /* soft yellow header */
-    color: #333;
-}
-
-#parkrun-table-container tr:nth-child(even) {
-    background-color: #fff8e1; /* alternating row color */
-}
-
-#parkrun-table-container tr:hover {
-    background-color: #ffe082; /* highlight on hover */
-}
-
-#parkrun-table-container {
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
 /* Quote Section */
 .quote-container {
     position: relative;
@@ -226,8 +183,7 @@ h2 span {
             <p>
                 On Saturdays, I am a regular attendee of 
                 <a href="https://www.parkrun.org.uk/eastville/" target="_blank">Eastville parkrun</a> 
-                and currently on my journey towards the 
-                <span class="hover-table-trigger">50-volunteer milestone t-shirt</span>.
+                and currently on my journey towards the 50-volunteer milestone t-shirt.
                 <br>
                 <a href="https://www.parkrun.org.uk/register/" target="_blank" class="button">Join parkrun</a>
             </p>
@@ -237,13 +193,6 @@ h2 span {
             </p>
         </div>
         <img src="https://dguo97.github.io/Eastville_parkrun.jpg" alt="Eastville parkrun start line">
-    </div>
-
-    <!-- Hidden container for volunteer table -->
-    <div id="parkrun-table-container" style="display:none; position:absolute; background:#fff9c4; border:2px solid #fbc02d; padding:15px; z-index:1000;">
-        <h3>Volunteer Summary — David GUO</h3>
-        <div id="table-wrap"><p>Loading…</p></div>
-        <div id="last-updated"></div>
     </div>
 
     <!-- Sundays - Woodlands Church -->
@@ -293,52 +242,6 @@ h2 span {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// Parkrun volunteer table
-document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
-    const container = document.getElementById('parkrun-table-container');
-
-    function renderTable(json) {
-        let total = json.data.reduce((sum,r)=>sum+r.occasions,0);
-        if(!json.data.some(r=>r.role==="Total Credits")) {
-            json.data.push({role:"Total Credits", occasions:total});
-        }
-
-        let html = '<table><thead><tr><th>Role</th><th>Occasions</th></tr></thead><tbody>';
-        json.data.forEach(r => html += `<tr><td>${r.role}</td><td>${r.occasions}</td></tr>`);
-        html += '</tbody></table>';
-        document.getElementById('table-wrap').innerHTML = html;
-
-        const dateObj = new Date(json.lastUpdated);
-        const day = String(dateObj.getUTCDate()).padStart(2,'0');
-        const month = String(dateObj.getUTCMonth()+1).padStart(2,'0');
-        const year = dateObj.getUTCFullYear();
-        const hours = String(dateObj.getUTCHours()).padStart(2,'0');
-        const minutes = String(dateObj.getUTCMinutes()).padStart(2,'0');
-        document.getElementById('last-updated').innerHTML =
-            `Last updated: ${day}/${month}/${year}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
-    }
-
-    trigger.addEventListener('mouseenter', e=>{
-        container.style.display='block';
-        container.style.top=(e.pageY+10)+'px';
-        container.style.left=(e.pageX+10)+'px';
-        fetch('https://dguo97.github.io/data/parkrun.json')
-            .then(res=>res.json()).then(json=>renderTable(json))
-            .catch(err=>{
-                console.warn('Failed to fetch JSON.',err);
-                document.getElementById('table-wrap').innerHTML='<p>Error loading data.</p>';
-                document.getElementById('last-updated').textContent='';
-            });
-    });
-
-    trigger.addEventListener('mousemove', e=>{
-        container.style.top=(e.pageY+10)+'px';
-        container.style.left=(e.pageX+10)+'px';
-    });
-
-    trigger.addEventListener('mouseleave', ()=>{ container.style.display='none'; });
-});
-
 // Quote confetti interaction
 const quoteContainer = document.querySelector('.quote-container');
 const quoteImg = document.querySelector('.quote-img');
