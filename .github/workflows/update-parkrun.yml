@@ -1,3 +1,4 @@
+```yaml
 name: Update Parkrun Volunteer Data
 
 on:
@@ -10,7 +11,7 @@ jobs:
   update-json:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # ✅ allow pushing back to the repo
+      contents: write   # ✅ allow push access
 
     steps:
       - uses: actions/checkout@v3
@@ -64,4 +65,5 @@ jobs:
           git config user.email "actions@github.com"
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+```
