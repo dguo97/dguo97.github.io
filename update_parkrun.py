@@ -1,20 +1,49 @@
-# update_parkrun.py
+import asyncio
+from playwright.async_api import async_playwright
+from bs4 import BeautifulSoup
 import json
-import datetime
+from datetime import datetime
 
-data = {
-    "last_updated": str(datetime.datetime.utcnow()),
-    "volunteers": [
-        {"name": "Alice", "events": 5},
-        {"name": "Bob", "events": 3}
-    ]
-}
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/")
+        await page.wait_for_selector("table#volunteer-history")  # wait until table loads
 
-# Make sure the folder exists
-import os
-os.makedirs("data", exist_ok=True)
+        content = await page.content()
+        await browser.close()
 
-with open("data/parkrun.json", "w") as f:
-    json.dump(data, f, indent=2)
+        # Parse the HTML
+        soup = BeautifulSoup(content, "html.parser")
+        table = soup.select_one("table#volunteer-history")
+        if not table:
+            raise ValueError("Volunteer history table not found")
 
-print("Parkrun JSON updated!")
+        data = []
+        total_credits = 0
+
+        for row in table.select("tbody tr"):
+            cols = row.find_all("td")
+            role = cols[0].text.strip()
+            occasions_text = cols[1].text.strip()
+            try:
+                occasions = int(occasions_text)
+            except ValueError:
+                occasions = 0
+            data.append({"role": role, "occasions": occasions})
+            total_credits += occasions
+
+        # Add total row
+        data.append({"role": "Total Credits", "occasions": total_credits})
+
+        result = {
+            "source": "parkrun 2305995",
+            "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+            "data": data
+        }
+
+        with open("data/parkrun.json", "w") as f:
+            json.dump(result, f, indent=2)
+
+asyncio.run(main())
