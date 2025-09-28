@@ -9,30 +9,34 @@ async def main():
         browser = await p.chromium.launch()
         page = await browser.new_page()
         
-        # Go to the Parkrun page
+        # Go to the Parkrun profile page
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/", wait_until="networkidle")
         
-        # Wait up to 60s for the table to appear
+        # Wait up to 60s for the Volunteer Summary container to appear
         try:
-            await page.wait_for_selector("table#volunteer-history", timeout=60000)
+            await page.wait_for_selector("#volunteer-summary", timeout=60000)
         except:
             await browser.close()
-            raise ValueError("Volunteer history table not found on the page")
+            raise ValueError("Volunteer summary table not found on the page")
         
         # Get the page HTML after JS rendering
         content = await page.content()
         await browser.close()
 
         soup = BeautifulSoup(content, "html.parser")
-        table = soup.select_one("table#volunteer-history")
+        container = soup.select_one("#volunteer-summary")
+        table = container.find("table") if container else None
+
         if not table:
-            raise ValueError("Volunteer history table missing after HTML parsing")
+            raise ValueError("Volunteer summary table missing after HTML parsing")
 
         data = []
         total_credits = 0
 
         for row in table.select("tbody tr"):
             cols = row.find_all("td")
+            if len(cols) < 2:
+                continue
             role = cols[0].text.strip()
             try:
                 occasions = int(cols[1].text.strip())
