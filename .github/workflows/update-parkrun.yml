@@ -13,54 +13,31 @@ jobs:
       contents: write
 
     steps:
+      # Checkout the repo with full history for safe rebase
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Fetch and parse Parkrun data
-        run: |
-          pip install requests beautifulsoup4
-          python - <<'EOF'
-import requests
-from bs4 import BeautifulSoup
-import json
-from datetime import datetime
+      # Install required Python packages
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
 
-url = "https://www.parkrun.org.uk/parkrunner/2305995/"
-r = requests.get(url)
-soup = BeautifulSoup(r.text, "html.parser")
+      # Run the Python script to update parkrun.json
+      - name: Run Parkrun update script
+        run: python update_parkrun.py
 
-table = soup.select_one("table#volunteer-history")
-data = []
-total_credits = 0
-if table:
-    rows = table.select("tbody tr")
-    for row in rows:
-        cols = row.find_all("td")
-        role = cols[0].text.strip()
-        occasions = int(cols[1].text.strip())
-        data.append({"role": role, "occasions": occasions})
-        total_credits += occasions
-
-data.append({"role": "Total Credits", "occasions": total_credits})
-
-result = {
-    "source": "parkrun 2305995",
-    "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
-    "data": data
-}
-
-with open("data/parkrun.json", "w") as f:
-    json.dump(result, f, indent=2)
-EOF
-
+      # Commit and push changes safely
       - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          git pull --rebase
+          git push
