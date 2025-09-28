@@ -35,7 +35,7 @@ jobs:
           BRANCH="${GITHUB_REF##*/}"
           git fetch origin $BRANCH
           git checkout $BRANCH
+          git pull --rebase origin $BRANCH   # <-- Move this up!
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes"
-          git pull --rebase origin $BRANCH
           git push origin $BRANCH
