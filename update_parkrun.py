@@ -8,17 +8,23 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page()
-        await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/")
-        await page.wait_for_selector("table#volunteer-history")  # wait until table loads
+        
+        # Go to the Parkrun page and wait until network is idle
+        await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/", wait_until="networkidle")
+        
+        # Optional: increase timeout to 60s
+        timeout_ms = 60000
+        table = await page.query_selector("table#volunteer-history")
+        if not table:
+            raise ValueError("Volunteer history table not found")
 
         content = await page.content()
         await browser.close()
 
-        # Parse the HTML
         soup = BeautifulSoup(content, "html.parser")
         table = soup.select_one("table#volunteer-history")
         if not table:
-            raise ValueError("Volunteer history table not found")
+            raise ValueError("Volunteer history table missing after HTML parsing")
 
         data = []
         total_credits = 0
@@ -26,15 +32,13 @@ async def main():
         for row in table.select("tbody tr"):
             cols = row.find_all("td")
             role = cols[0].text.strip()
-            occasions_text = cols[1].text.strip()
             try:
-                occasions = int(occasions_text)
+                occasions = int(cols[1].text.strip())
             except ValueError:
                 occasions = 0
             data.append({"role": role, "occasions": occasions})
             total_credits += occasions
 
-        # Add total row
         data.append({"role": "Total Credits", "occasions": total_credits})
 
         result = {
