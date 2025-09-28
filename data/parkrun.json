@@ -1,14 +1,13 @@
 {
-
-  "lastUpdated": "2025-09-27 12:00:00 UTC",
-  "data": [
-    {"role": "Timekeeper", "occasions": 1},
-    {"role": "Token Sorting", "occasions": 21},
-    {"role": "Marshal", "occasions": 3},
-    {"role": "Barcode Scanning", "occasions": 41},
-    {"role": "Post-event Close Down", "occasions": 1},
-    {"role": "Finish Tokens", "occasions": 1},
-    {"role": "Number Checker", "occasions": 1},
-    {"role": "Total Credits", "occasions": 48}
+  "last_updated": "2025-09-28 19:20:52.052360",
+  "volunteers": [
+    {
+      "name": "Alice",
+      "events": 5
+    },
+    {
+      "name": "Bob",
+      "events": 3
+    }
   ]
 }
