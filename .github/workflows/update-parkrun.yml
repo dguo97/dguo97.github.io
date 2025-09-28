@@ -18,11 +18,11 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # Check out the *branch* explicitly so we’re not in detached HEAD
+      # Checkout the branch explicitly to avoid detached HEAD
       - uses: actions/checkout@v3
         with:
-          ref: new2          # <<< replace with your branch name if different
-          fetch-depth: 0     # full history so rebase works
+          ref: new2          # change if your branch name differs
+          fetch-depth: 0     # full history for rebase
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -40,15 +40,17 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          BRANCH="new2"   # same branch as above; keep in sync
+          # Ensure we are on the correct branch and track remote
+          git checkout new2
+          git branch --set-upstream-to=origin/new2
 
-          # Make sure we have the latest remote commits
-          git fetch origin $BRANCH
-          git pull --rebase origin $BRANCH
+          # Rebase on latest remote commits
+          git fetch origin new2
+          git pull --rebase origin new2
 
-          # Stage and commit if there are changes
+          # Stage and commit changes
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes to commit"
 
-          # Safe force-push to handle remote updates
-          git push origin $BRANCH --force-with-lease
+          # Safe force-push
+          git push origin new2 --force-with-lease
