@@ -2,7 +2,9 @@ import requests
 import json
 from datetime import datetime
 
+# Parkrun volunteer JSON endpoint
 url = "https://www.parkrun.org.uk/parkrunner/2305995/volunteer-history/json/"
+
 r = requests.get(url)
 r.raise_for_status()
 volunteers = r.json()
@@ -15,6 +17,7 @@ for item in volunteers:
     data.append({"role": role, "occasions": occasions})
     total_credits += occasions
 
+# Add total row
 data.append({"role": "Total Credits", "occasions": total_credits})
 
 result = {
@@ -25,3 +28,5 @@ result = {
 
 with open("data/parkrun.json", "w") as f:
     json.dump(result, f, indent=2)
+
+print("✅ Parkrun volunteer data updated successfully.")
