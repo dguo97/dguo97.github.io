@@ -2,8 +2,8 @@ name: Update Parkrun JSON
 
 on:
   schedule:
-    - cron: '0 12 * * 6'   # Saturday 12:00 UTC
-    - cron: '0 12 * * 0'   # Sunday 12:00 UTC
+    - cron: '0 12 * * 6'
+    - cron: '0 12 * * 0'
   workflow_dispatch:
 
 jobs:
@@ -17,12 +17,12 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # Checkout the branch explicitly
+      # 1️⃣ Checkout branch (detached HEAD fix)
       - uses: actions/checkout@v3
         with:
-          ref: new2
           fetch-depth: 0
 
+      # 2️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -31,20 +31,24 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4
 
-      # Ensure branch is in sync with remote
-      - name: Reset branch to remote
+      # 3️⃣ Force-create local branch from remote
+      - name: Prepare branch
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+
+          # Delete local branch if exists
+          git branch -D new2 || true
+          
+          # Create local branch from remote
           git fetch origin new2
           git checkout -B new2 origin/new2
-          git reset --hard origin/new2
 
-      # Run your script
+      # 4️⃣ Run the script
       - name: Run Parkrun update script
         run: python update_parkrun.py
 
-      # Commit and force-push changes
+      # 5️⃣ Commit & force push
       - name: Commit and push
         run: |
           git add data/parkrun.json
