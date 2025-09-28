@@ -1,27 +1,44 @@
-from bs4 import BeautifulSoup
+import asyncio
+from playwright.async_api import async_playwright
+import json
+from datetime import datetime
+import os
 
-# Load your HTML file
-with open("parkrun.html", "r", encoding="utf-8") as f:
-    html = f.read()
+async def main():
+    os.makedirs("data", exist_ok=True)
+    
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        
+        await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/", wait_until="networkidle")
+        
+        # Extract volunteer summary table rows
+        volunteer_data = await page.eval_on_selector_all(
+            "#volunteer-summary table tr",
+            """rows => rows.slice(1).map(r => {
+                const cells = r.querySelectorAll('td');
+                const role = cells[0]?.innerText.trim() || '';
+                const occasions = parseInt(cells[1]?.innerText.replace(/,/g, '').trim()) || 0;
+                return { role, occasions };
+            })"""
+        )
 
-soup = BeautifulSoup(html, "html.parser")
+        if not volunteer_data:
+            raise ValueError("Could not extract volunteer data")
 
-# Find the Volunteer Summary section
-vol_summary_header = soup.find("h3", string="Volunteer Summary")
-if vol_summary_header:
-    table = vol_summary_header.find_next("table")  # the table right after the header
-    volunteer_summary = []
+        total_credits = sum(v['occasions'] for v in volunteer_data)
+        volunteer_data.append({"role": "Total Credits", "occasions": total_credits})
 
-    # Extract table rows
-    for row in table.find_all("tr")[1:]:  # skip header row
-        cols = row.find_all("td")
-        role = cols[0].text.strip()
-        occasions = cols[1].text.strip()
-        volunteer_summary.append((role, occasions))
+        result = {
+            "source": "parkrun 2305995",
+            "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+            "data": volunteer_data
+        }
 
-    # Print results
-    print("Volunteer Summary:")
-    for role, occasions in volunteer_summary:
-        print(f"{role}: {occasions}")
-else:
-    print("Volunteer Summary not found.")
+        with open("data/parkrun.json", "w") as f:
+            json.dump(result, f, indent=2)
+
+        print("✅ Parkrun volunteer data updated successfully")
+
+asyncio.run(main())
