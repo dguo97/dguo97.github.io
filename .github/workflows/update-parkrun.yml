@@ -1,9 +1,9 @@
-name: Update Parkrun JSON
+name: Update Parkrun Volunteer Data
 
 on:
   schedule:
-    - cron: '0 12 * * 6'  # Saturday at 12:00 UTC
-    - cron: '0 12 * * 0'  # Sunday at 12:00 UTC
+    - cron: '0 12 * * 6'
+    - cron: '0 12 * * 0'
   workflow_dispatch:
 
 jobs:
@@ -23,39 +23,54 @@ jobs:
       - name: Fetch and parse Parkrun data
         run: |
           pip install requests beautifulsoup4
-          python - <<'EOF'
-import requests
-from bs4 import BeautifulSoup
-import json
-from datetime import datetime
+          mkdir -p data
 
-url = "https://www.parkrun.org.uk/parkrunner/2305995/"
-r = requests.get(url)
-soup = BeautifulSoup(r.text, "html.parser")
+          # write the Python script and execute it
+          cat > scripts/parse_parkrun.py <<'EOF'
+          #!/usr/bin/env python3
+          import requests
+          from bs4 import BeautifulSoup
+          import json
+          from datetime import datetime
+          import sys
 
-table = soup.select_one("table#volunteer-history")
-data = []
-total_credits = 0
-if table:
-    rows = table.select("tbody tr")
-    for row in rows:
-        cols = row.find_all("td")
-        role = cols[0].text.strip()
-        occasions = int(cols[1].text.strip())
-        data.append({"role": role, "occasions": occasions})
-        total_credits += occasions
+          url = "https://www.parkrun.org.uk/parkrunner/2305995/"
+          r = requests.get(url, timeout=15)
+          if r.status_code != 200:
+              print("Failed to fetch page, status:", r.status_code)
+              sys.exit(1)
 
-data.append({"role": "Total Credits", "occasions": total_credits})
+          soup = BeautifulSoup(r.text, "html.parser")
+          table = soup.select_one("table#volunteer-history")
+          data = []
+          total_credits = 0
+          if table:
+              rows = table.select("tbody tr")
+              for row in rows:
+                  cols = row.find_all("td")
+                  if len(cols) >= 2:
+                      role = cols[0].text.strip()
+                      try:
+                          occasions = int(cols[1].text.strip())
+                      except ValueError:
+                          occasions = 0
+                      data.append({"role": role, "occasions": occasions})
+                      total_credits += occasions
 
-result = {
-    "source": "parkrun 2305995",
-    "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
-    "data": data
-}
+          # Add total row
+          data.append({"role": "Total Credits", "occasions": total_credits})
 
-with open("data/parkrun.json", "w") as f:
-    json.dump(result, f, indent=2)
-EOF
+          result = {
+              "source": "parkrun 2305995",
+              "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+              "data": data
+          }
+
+          with open("data/parkrun.json", "w", encoding="utf-8") as f:
+              json.dump(result, f, indent=2, ensure_ascii=False)
+          EOF
+
+          python scripts/parse_parkrun.py
 
       - name: Commit and push
         run: |
@@ -63,4 +78,4 @@ EOF
           git config user.email "actions@github.com"
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
