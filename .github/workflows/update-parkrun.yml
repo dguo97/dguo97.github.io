@@ -2,8 +2,8 @@ name: Update Parkrun JSON
 
 on:
   schedule:
-    - cron: '0 12 * * 6'  # Saturday at 12:00 UTC
-    - cron: '0 12 * * 0'  # Sunday at 12:00 UTC
+    - cron: '0 12 * * 6'  # Saturday 12:00 UTC
+    - cron: '0 12 * * 0'  # Sunday 12:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       contents: write
 
     steps:
-      # Checkout the repo with full history for safe rebase
+      # Checkout full history for safe rebase
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -24,15 +24,17 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Install required Python packages
+      # Install Playwright and dependencies
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: |
+          pip install playwright beautifulsoup4
+          python -m playwright install
 
-      # Run the Python script to update parkrun.json
+      # Run the scraper
       - name: Run Parkrun update script
         run: python update_parkrun.py
 
-      # Commit and push changes safely
+      # Commit and push updated JSON
       - name: Commit and push
         run: |
           git config user.name "github-actions"
