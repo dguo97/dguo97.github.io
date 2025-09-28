@@ -2,8 +2,8 @@ name: Update Parkrun JSON
 
 on:
   schedule:
-    - cron: '0 12 * * 6'   # Saturday 12:00 UTC
-    - cron: '0 12 * * 0'   # Sunday 12:00 UTC
+    - cron: '0 12 * * 6'  # Saturday at 12:00 UTC
+    - cron: '0 12 * * 0'  # Sunday at 12:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -12,56 +12,55 @@ jobs:
     permissions:
       contents: write
 
-    concurrency:
-      group: update-parkrun
-      cancel-in-progress: true
-
     steps:
-      # 1️⃣ Checkout branch fully
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      # 2️⃣ Configure Git user
-      - name: Configure Git
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Fetch and parse Parkrun data
+        run: |
+          pip install requests beautifulsoup4
+          python - <<'EOF'
+import requests
+from bs4 import BeautifulSoup
+import json
+from datetime import datetime
+
+url = "https://www.parkrun.org.uk/parkrunner/2305995/"
+r = requests.get(url)
+soup = BeautifulSoup(r.text, "html.parser")
+
+table = soup.select_one("table#volunteer-history")
+data = []
+total_credits = 0
+if table:
+    rows = table.select("tbody tr")
+    for row in rows:
+        cols = row.find_all("td")
+        role = cols[0].text.strip()
+        occasions = int(cols[1].text.strip())
+        data.append({"role": role, "occasions": occasions})
+        total_credits += occasions
+
+data.append({"role": "Total Credits", "occasions": total_credits})
+
+result = {
+    "source": "parkrun 2305995",
+    "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+    "data": data
+}
+
+with open("data/parkrun.json", "w") as f:
+    json.dump(result, f, indent=2)
+EOF
+
+      - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-
-      # 3️⃣ Prepare branch to ensure it tracks remote
-      - name: Prepare branch
-        run: |
-          git fetch origin new2
-          git checkout -B new2 origin/new2
-
-      # 4️⃣ Update data/parkrun.json
-      - name: Update parkrun JSON
-        run: |
-          mkdir -p data
-          cat > data/parkrun.json << 'EOF'
-{
-  "parkrunner": {
-    "name": "David GUO",
-    "id": "A2305995",
-    "parkruns_total": 216
-  },
-  "last_updated": "2025-09-27T08:59:46Z",
-  "volunteer_summary": [
-    {"role": "Timekeeper", "occasions": 1},
-    {"role": "Token Sorting", "occasions": 21},
-    {"role": "Marshal", "occasions": 3},
-    {"role": "Barcode Scanning", "occasions": 41},
-    {"role": "Post-event Close Down", "occasions": 1},
-    {"role": "Finish Tokens", "occasions": 1},
-    {"role": "Number Checker", "occasions": 1}
-  ],
-  "total_credits": 48
-}
-EOF
-
-      # 5️⃣ Commit and push changes
-      - name: Commit and push
-        run: |
           git add data/parkrun.json
-          git commit -m "Update parkrun volunteer summary" || echo "No changes to commit"
-          git push origin new2 --force
+          git commit -m "Update parkrun volunteer data" || echo "No changes"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
