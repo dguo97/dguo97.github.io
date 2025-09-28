@@ -38,26 +38,24 @@ jobs:
       - name: Update parkrun JSON
         run: |
           mkdir -p data
-          cat > data/parkrun.json <<'JSON'
-{
-  "parkrunner": {
-    "name": "David GUO",
-    "id": "A2305995",
-    "parkruns_total": 216
+          echo "{
+  \"parkrunner\": {
+    \"name\": \"David GUO\",
+    \"id\": \"A2305995\",
+    \"parkruns_total\": 216
   },
-  "last_updated": "2025-09-27T08:59:46Z",
-  "volunteer_summary": [
-    {"role": "Timekeeper", "occasions": 1},
-    {"role": "Token Sorting", "occasions": 21},
-    {"role": "Marshal", "occasions": 3},
-    {"role": "Barcode Scanning", "occasions": 41},
-    {"role": "Post-event Close Down", "occasions": 1},
-    {"role": "Finish Tokens", "occasions": 1},
-    {"role": "Number Checker", "occasions": 1}
+  \"last_updated\": \"2025-09-27T08:59:46Z\",
+  \"volunteer_summary\": [
+    {\"role\": \"Timekeeper\", \"occasions\": 1},
+    {\"role\": \"Token Sorting\", \"occasions\": 21},
+    {\"role\": \"Marshal\", \"occasions\": 3},
+    {\"role\": \"Barcode Scanning\", \"occasions\": 41},
+    {\"role\": \"Post-event Close Down\", \"occasions\": 1},
+    {\"role\": \"Finish Tokens\", \"occasions\": 1},
+    {\"role\": \"Number Checker\", \"occasions\": 1}
   ],
-  "total_credits": 48
-}
-JSON
+  \"total_credits\": 48
+}" > data/parkrun.json
 
       # 5️⃣ Commit and push changes
       - name: Commit and push
