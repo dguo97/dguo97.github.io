@@ -1,41 +1,27 @@
-import asyncio
-from playwright.async_api import async_playwright
-import json
-from datetime import datetime
+from bs4 import BeautifulSoup
 
-async def main():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-        
-        await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/", wait_until="networkidle")
-        
-        # Extract volunteer summary text directly
-        volunteer_data = await page.eval_on_selector_all(
-            "#volunteer-summary .volunteer-role",
-            """roles => roles.map(r => {
-                const occasionEl = r.nextElementSibling;
-                const role = r.innerText.trim();
-                const occasions = occasionEl ? parseInt(occasionEl.innerText.trim()) || 0 : 0;
-                return { role, occasions };
-            })"""
-        )
+# Load your HTML file
+with open("parkrun.html", "r", encoding="utf-8") as f:
+    html = f.read()
 
-        if not volunteer_data:
-            raise ValueError("Could not extract volunteer data")
+soup = BeautifulSoup(html, "html.parser")
 
-        total_credits = sum(v['occasions'] for v in volunteer_data)
-        volunteer_data.append({"role": "Total Credits", "occasions": total_credits})
+# Find the Volunteer Summary section
+vol_summary_header = soup.find("h3", string="Volunteer Summary")
+if vol_summary_header:
+    table = vol_summary_header.find_next("table")  # the table right after the header
+    volunteer_summary = []
 
-        result = {
-            "source": "parkrun 2305995",
-            "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
-            "data": volunteer_data
-        }
+    # Extract table rows
+    for row in table.find_all("tr")[1:]:  # skip header row
+        cols = row.find_all("td")
+        role = cols[0].text.strip()
+        occasions = cols[1].text.strip()
+        volunteer_summary.append((role, occasions))
 
-        with open("data/parkrun.json", "w") as f:
-            json.dump(result, f, indent=2)
-
-        print("✅ Parkrun volunteer data updated successfully")
-
-asyncio.run(main())
+    # Print results
+    print("Volunteer Summary:")
+    for role, occasions in volunteer_summary:
+        print(f"{role}: {occasions}")
+else:
+    print("Volunteer Summary not found.")
