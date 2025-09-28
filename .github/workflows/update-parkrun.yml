@@ -2,8 +2,8 @@ name: Update Parkrun JSON
 
 on:
   schedule:
-    - cron: '0 12 * * 6'
-    - cron: '0 12 * * 0'
+    - cron: '0 12 * * 6'   # Saturday 12:00 UTC
+    - cron: '0 12 * * 0'   # Sunday 12:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -17,40 +17,51 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # 1️⃣ Checkout branch (detached HEAD fix)
+      # 1️⃣ Checkout branch fully
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # 2️⃣ Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install dependencies
-        run: pip install requests beautifulsoup4
-
-      # 3️⃣ Force-create local branch from remote
-      - name: Prepare branch
+      # 2️⃣ Configure Git user
+      - name: Configure Git
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          # Delete local branch if exists
-          git branch -D new2 || true
-          
-          # Create local branch from remote
+      # 3️⃣ Prepare branch to ensure it tracks remote
+      - name: Prepare branch
+        run: |
           git fetch origin new2
           git checkout -B new2 origin/new2
 
-      # 4️⃣ Run the script
-      - name: Run Parkrun update script
-        run: python update_parkrun.py
+      # 4️⃣ Update data/parkrun.json
+      - name: Update parkrun JSON
+        run: |
+          mkdir -p data
+          cat > data/parkrun.json <<'JSON'
+{
+  "parkrunner": {
+    "name": "David GUO",
+    "id": "A2305995",
+    "parkruns_total": 216
+  },
+  "last_updated": "2025-09-27T08:59:46Z",
+  "volunteer_summary": [
+    {"role": "Timekeeper", "occasions": 1},
+    {"role": "Token Sorting", "occasions": 21},
+    {"role": "Marshal", "occasions": 3},
+    {"role": "Barcode Scanning", "occasions": 41},
+    {"role": "Post-event Close Down", "occasions": 1},
+    {"role": "Finish Tokens", "occasions": 1},
+    {"role": "Number Checker", "occasions": 1}
+  ],
+  "total_credits": 48
+}
+JSON
 
-      # 5️⃣ Commit & force push
+      # 5️⃣ Commit and push changes
       - name: Commit and push
         run: |
           git add data/parkrun.json
-          git commit -m "Update parkrun volunteer data" || echo "No changes to commit"
+          git commit -m "Update parkrun volunteer summary" || echo "No changes to commit"
           git push origin new2 --force
