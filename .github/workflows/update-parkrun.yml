@@ -12,11 +12,17 @@ jobs:
     permissions:
       contents: write
 
+    # Prevent overlapping runs
+    concurrency:
+      group: update-parkrun
+      cancel-in-progress: true
+
     steps:
+      # Check out the *branch* explicitly so we’re not in detached HEAD
       - uses: actions/checkout@v3
         with:
-          # Important: fetch all history so rebase works
-          fetch-depth: 0
+          ref: new2          # <<< replace with your branch name if different
+          fetch-depth: 0     # full history so rebase works
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,18 +35,20 @@ jobs:
       - name: Run Parkrun update script
         run: python update_parkrun.py
 
-      - name: Commit and push safely
+      - name: Commit and push updated JSON
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          BRANCH="${GITHUB_REF##*/}"
+          BRANCH="new2"   # same branch as above; keep in sync
 
-          # Make sure we have the latest remote commits before adding ours
+          # Make sure we have the latest remote commits
           git fetch origin $BRANCH
-          git checkout $BRANCH
           git pull --rebase origin $BRANCH
 
+          # Stage and commit if there are changes
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes to commit"
-          git push origin $BRANCH
+
+          # Safe force-push to handle remote updates
+          git push origin $BRANCH --force-with-lease
