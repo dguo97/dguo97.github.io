@@ -5,21 +5,19 @@ from datetime import datetime
 import os
 
 async def main():
-    os.makedirs("data", exist_ok=True)
-    
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/", wait_until="networkidle")
         
-        # Extract volunteer summary table rows
+        # Extract volunteer data from the table
         volunteer_data = await page.eval_on_selector_all(
-            "#volunteer-summary table tr",
-            """rows => rows.slice(1).map(r => {
-                const cells = r.querySelectorAll('td');
-                const role = cells[0]?.innerText.trim() || '';
-                const occasions = parseInt(cells[1]?.innerText.replace(/,/g, '').trim()) || 0;
+            "#volunteer-summary + table#results tbody tr",
+            """rows => rows.map(r => {
+                const cols = r.querySelectorAll("td");
+                const role = cols[0].innerText.trim();
+                const occasions = parseInt(cols[1].innerText.trim()) || 0;
                 return { role, occasions };
             })"""
         )
@@ -27,7 +25,10 @@ async def main():
         if not volunteer_data:
             raise ValueError("Could not extract volunteer data")
 
-        total_credits = sum(v['occasions'] for v in volunteer_data)
+        # Extract total credits from the table footer
+        total_credits_el = await page.query_selector("#volunteer-summary + table#results tfoot tr td:last-child")
+        total_credits = int(await total_credits_el.inner_text()) if total_credits_el else sum(v['occasions'] for v in volunteer_data)
+        
         volunteer_data.append({"role": "Total Credits", "occasions": total_credits})
 
         result = {
@@ -35,6 +36,9 @@ async def main():
             "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
             "data": volunteer_data
         }
+
+        # Ensure the data directory exists
+        os.makedirs("data", exist_ok=True)
 
         with open("data/parkrun.json", "w") as f:
             json.dump(result, f, indent=2)
