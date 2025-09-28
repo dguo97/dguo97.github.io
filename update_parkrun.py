@@ -1,19 +1,28 @@
 import requests
+from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 
-# Parkrun volunteer JSON endpoint
-url = "https://www.parkrun.org.uk/parkrunner/2305995/volunteer-history/json/"
+url = "https://www.parkrun.org.uk/parkrunner/2305995/"
 
 r = requests.get(url)
 r.raise_for_status()
-volunteers = r.json()
+soup = BeautifulSoup(r.text, "html.parser")
+
+table = soup.find("table", {"id": "volunteer-history"})
+if not table:
+    raise ValueError("Volunteer history table not found in HTML")
 
 data = []
 total_credits = 0
-for item in volunteers:
-    role = item["Role"]
-    occasions = item["Occasions"]
+
+for row in table.select("tbody tr"):
+    cols = row.find_all("td")
+    role = cols[0].text.strip()
+    try:
+        occasions = int(cols[1].text.strip())
+    except ValueError:
+        occasions = 0
     data.append({"role": role, "occasions": occasions})
     total_credits += occasions
 
@@ -29,4 +38,4 @@ result = {
 with open("data/parkrun.json", "w") as f:
     json.dump(result, f, indent=2)
 
-print("✅ Parkrun volunteer data updated successfully.")
+print("✅ Parkrun volunteer data updated successfully")
