@@ -13,7 +13,7 @@ jobs:
       contents: write
 
     steps:
-      # Checkout full history for safe rebase
+      # Checkout repo
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -24,14 +24,12 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Install Playwright and dependencies
+      # Install requests
       - name: Install dependencies
-        run: |
-          pip install playwright beautifulsoup4
-          python -m playwright install
+        run: pip install requests
 
       # Run the scraper
-      - name: Run Parkrun update script
+      - name: Update Parkrun JSON
         run: python update_parkrun.py
 
       # Commit and push updated JSON
