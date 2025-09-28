@@ -17,11 +17,11 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # Checkout the branch explicitly to avoid detached HEAD
+      # Checkout the branch explicitly
       - uses: actions/checkout@v3
         with:
-          ref: new2          # branch you want to update
-          fetch-depth: 0     # full history for rebase or reset
+          ref: new2
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -31,21 +31,22 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4
 
-      - name: Hard reset branch to latest remote
-        run: |
-          git fetch origin new2
-          git reset --hard origin/new2
-
-      - name: Run Parkrun update script
-        run: python update_parkrun.py
-
-      - name: Commit and force-push updated JSON
+      # Ensure branch is in sync with remote
+      - name: Reset branch to remote
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+          git fetch origin new2
+          git checkout -B new2 origin/new2
+          git reset --hard origin/new2
 
+      # Run your script
+      - name: Run Parkrun update script
+        run: python update_parkrun.py
+
+      # Commit and force-push changes
+      - name: Commit and push
+        run: |
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes to commit"
-
-          # Force-push to overwrite remote branch
           git push origin new2 --force
