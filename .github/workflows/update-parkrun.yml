@@ -1,6 +1,3 @@
-```yaml
-name: Update Parkrun Volunteer Data
-
 on:
   schedule:
     - cron: '0 12 * * 6'
