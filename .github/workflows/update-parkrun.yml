@@ -1,9 +1,9 @@
-name: Update Parkrun Volunteer Data
+name: Update Parkrun JSON
 
 on:
   schedule:
-    - cron: '0 12 * * 6'
-    - cron: '0 12 * * 0'
+    - cron: '0 12 * * 6'  # Saturday at 12:00 UTC
+    - cron: '0 12 * * 0'  # Sunday at 12:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -20,62 +20,17 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Fetch and parse Parkrun data
-        run: |
-          pip install requests beautifulsoup4
-          mkdir -p data
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
 
-          # write the Python script and execute it
-          cat > scripts/parse_parkrun.py <<'EOF'
-          #!/usr/bin/env python3
-          import requests
-          from bs4 import BeautifulSoup
-          import json
-          from datetime import datetime
-          import sys
+      - name: Run Parkrun update script
+        run: python update_parkrun.py
 
-          url = "https://www.parkrun.org.uk/parkrunner/2305995/"
-          r = requests.get(url, timeout=15)
-          if r.status_code != 200:
-              print("Failed to fetch page, status:", r.status_code)
-              sys.exit(1)
-
-          soup = BeautifulSoup(r.text, "html.parser")
-          table = soup.select_one("table#volunteer-history")
-          data = []
-          total_credits = 0
-          if table:
-              rows = table.select("tbody tr")
-              for row in rows:
-                  cols = row.find_all("td")
-                  if len(cols) >= 2:
-                      role = cols[0].text.strip()
-                      try:
-                          occasions = int(cols[1].text.strip())
-                      except ValueError:
-                          occasions = 0
-                      data.append({"role": role, "occasions": occasions})
-                      total_credits += occasions
-
-          # Add total row
-          data.append({"role": "Total Credits", "occasions": total_credits})
-
-          result = {
-              "source": "parkrun 2305995",
-              "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
-              "data": data
-          }
-
-          with open("data/parkrun.json", "w", encoding="utf-8") as f:
-              json.dump(result, f, indent=2, ensure_ascii=False)
-          EOF
-
-          python scripts/parse_parkrun.py
-
-      - name: Commit and push
+      - name: Commit and push safely
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data/parkrun.json
           git commit -m "Update parkrun volunteer data" || echo "No changes"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          git pull --rebase origin ${{ github.ref_name }}
+          git push origin ${{ github.ref_name }}
