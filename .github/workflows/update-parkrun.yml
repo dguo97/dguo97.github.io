@@ -13,26 +13,23 @@ jobs:
       contents: write
 
     steps:
-      # Checkout repo
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # Install requests
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
 
-      # Run the scraper
       - name: Update Parkrun JSON
         run: python update_parkrun.py
 
-      # Commit and push updated JSON
       - name: Commit and push
         run: |
           git config user.name "github-actions"
