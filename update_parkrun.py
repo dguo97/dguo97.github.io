@@ -8,39 +8,31 @@ async def main():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         
-        # Go to the Parkrun profile page
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/", wait_until="networkidle")
         
-        # Wait for the volunteer summary table to appear
-        try:
-            await page.wait_for_selector("#volunteer-summary table", timeout=10000)  # 10s timeout
-        except:
-            raise ValueError("Volunteer summary table did not appear in time")
-        
-        # Extract table rows directly
-        rows = await page.eval_on_selector_all(
-            "#volunteer-summary table tbody tr",
-            """rows => rows.map(row => {
-                const cells = row.querySelectorAll('td');
-                return {
-                    role: cells[0]?.innerText.trim() || '',
-                    occasions: parseInt(cells[1]?.innerText.trim() || '0')
-                }
+        # Extract volunteer summary text directly
+        volunteer_data = await page.eval_on_selector_all(
+            "#volunteer-summary .volunteer-role",
+            """roles => roles.map(r => {
+                const occasionEl = r.nextElementSibling;
+                const role = r.innerText.trim();
+                const occasions = occasionEl ? parseInt(occasionEl.innerText.trim()) || 0 : 0;
+                return { role, occasions };
             })"""
         )
 
-        # Calculate total credits
-        total_credits = sum(row['occasions'] for row in rows)
-        rows.append({"role": "Total Credits", "occasions": total_credits})
+        if not volunteer_data:
+            raise ValueError("Could not extract volunteer data")
 
-        # Prepare JSON
+        total_credits = sum(v['occasions'] for v in volunteer_data)
+        volunteer_data.append({"role": "Total Credits", "occasions": total_credits})
+
         result = {
             "source": "parkrun 2305995",
             "lastUpdated": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
-            "data": rows
+            "data": volunteer_data
         }
 
-        # Save to JSON
         with open("data/parkrun.json", "w") as f:
             json.dump(result, f, indent=2)
 
