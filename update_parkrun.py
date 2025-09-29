@@ -6,28 +6,22 @@ import os
 
 async def main():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(headless=False, slow_mo=100)
         page = await browser.new_page()
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/")
 
-        # Wait up to 10 seconds for ANY #results table to appear
+        # Take a screenshot for debugging
+        await page.screenshot(path="debug.png", full_page=True)
+
+        # Wait for the Volunteer Summary heading
         try:
-            await page.wait_for_selector("table#results", timeout=10000)
+            await page.wait_for_selector("h3#volunteer-summary", timeout=15000)
         except:
-            print("No table#results found (timeout).")
+            print("Volunteer Summary heading not found.")
             return
 
-        # Find all tables with id="results"
-        tables = await page.query_selector_all("table#results")
-        volunteer_table = None
-
-        # Look for table whose header contains "Role" and "Occasions"
-        for table in tables:
-            header = await table.inner_text()
-            if "Role" in header and "Occasions" in header:
-                volunteer_table = table
-                break
-
+        # Find the table immediately after the heading
+        volunteer_table = await page.query_selector("h3#volunteer-summary + table")
         if not volunteer_table:
             print("Volunteer Summary table not found.")
             return
