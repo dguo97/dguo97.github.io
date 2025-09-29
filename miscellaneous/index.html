@@ -62,18 +62,18 @@ h2 span {
     min-width: 250px;
 }
 
-.activity-text a.button {
+a.button {
     display: inline-block;
     background-color: #2980b9;
     color: white;
     padding: 10px 20px;
-    margin-top: 10px;
     border-radius: 5px;
     text-decoration: none;
     transition: background-color 0.3s;
+    font-weight: bold;
 }
 
-.activity-text a.button:hover {
+a.button:hover {
     background-color: #1f618d;
 }
 
@@ -130,6 +130,13 @@ h2 span {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+.footnote {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #555;
+    font-style: italic;
+}
+
 /* Quote Section */
 .quote-container {
     position: relative;
@@ -154,6 +161,7 @@ h2 span {
 
 .quote-hover {
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.5s ease;
 }
 
@@ -307,6 +315,13 @@ document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
         let html = '<table><thead><tr><th>Role</th><th>Occasions</th></tr></thead><tbody>';
         json.data.forEach(r => html += `<tr><td>${r.role}</td><td>${r.occasions}</td></tr>`);
         html += '</tbody></table>';
+
+        // ✅ Add source as footnote
+        html += `<div class="footnote">
+                    Source: <a href="https://www.parkrun.org.uk/parkrunner/2305995/" target="_blank">
+                    https://www.parkrun.org.uk/parkrunner/2305995/</a>
+                 </div>`;
+
         document.getElementById('table-wrap').innerHTML = html;
 
         const dateObj = new Date(json.lastUpdated);
@@ -327,8 +342,7 @@ document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
             .then(res=>res.json()).then(json=>renderTable(json))
             .catch(err=>{
                 console.warn('Failed to fetch JSON.',err);
-                document.getElementById('table-wrap').innerHTML='<p>Error loading data.</p>';
-                document.getElementById('last-updated').textContent='';
+                container.style.display='none';
             });
     });
 
@@ -354,6 +368,7 @@ quoteContainer.addEventListener('mouseenter', () => {
     yesButton.style.opacity = 0;
     blessedMsg.style.opacity = 0; 
     document.querySelector('.quote-hover').style.opacity = 1;
+    document.querySelector('.quote-hover').style.pointerEvents = "auto";
     setTimeout(()=>{ message.style.opacity=1 },500);
     setTimeout(()=>{ yesButton.style.opacity=1 },1500);
 });
@@ -365,6 +380,7 @@ quoteContainer.addEventListener('mouseleave', () => {
     yesButton.style.opacity=0;
     blessedMsg.style.opacity=0;
     document.querySelector('.quote-hover').style.opacity=0;
+    document.querySelector('.quote-hover').style.pointerEvents = "none";
 });
 
 yesButton.addEventListener('click', () => {
