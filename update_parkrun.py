@@ -6,23 +6,23 @@ import os
 
 async def main():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, slow_mo=100)
+        # Always use headless=True for CI/server environments
+        browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/")
 
-        # Take a screenshot for debugging
-        await page.screenshot(path="debug.png", full_page=True)
-
-        # Wait for the Volunteer Summary heading
+        # Take a screenshot for debugging, even on failure
         try:
             await page.wait_for_selector("h3#volunteer-summary", timeout=15000)
         except:
+            await page.screenshot(path="debug-volunteer-summary-not-found.png", full_page=True)
             print("Volunteer Summary heading not found.")
             return
 
         # Find the table immediately after the heading
         volunteer_table = await page.query_selector("h3#volunteer-summary + table")
         if not volunteer_table:
+            await page.screenshot(path="debug-volunteer-table-not-found.png", full_page=True)
             print("Volunteer Summary table not found.")
             return
 
@@ -36,6 +36,7 @@ async def main():
         )
 
         if not volunteer_data:
+            await page.screenshot(path="debug-no-volunteer-rows.png", full_page=True)
             print("No volunteer data rows found.")
             return
 
