@@ -1,13 +1,38 @@
 {
-  "last_updated": "2025-09-28 19:43:26.481292",
-  "volunteers": [
+  "source": "parkrun 2305995",
+  "lastUpdated": "2025-09-29 09:04:45 UTC",
+  "data": [
     {
-      "name": "Alice",
-      "events": 5
+      "role": "Timekeeper",
+      "occasions": 1
     },
     {
-      "name": "Bob",
-      "events": 3
+      "role": "Token Sorting",
+      "occasions": 21
+    },
+    {
+      "role": "Marshal",
+      "occasions": 3
+    },
+    {
+      "role": "Barcode Scanning",
+      "occasions": 41
+    },
+    {
+      "role": "Post-event Close Down",
+      "occasions": 1
+    },
+    {
+      "role": "Finish Tokens",
+      "occasions": 2
+    },
+    {
+      "role": "Number Checker",
+      "occasions": 1
+    },
+    {
+      "role": "Total Credits",
+      "occasions": 49
     }
   ]
 }
