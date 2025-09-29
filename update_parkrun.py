@@ -13,14 +13,16 @@ async def main():
 
         # Take a screenshot for debugging, even on failure
         try:
-            await page.wait_for_selector("h3#volunteer-summary", timeout=15000)
+            # Wait for the Volunteer Summary heading
+            heading = await page.wait_for_selector("h3#volunteer-summary", timeout=15000)
         except:
             await page.screenshot(path="debug-volunteer-summary-not-found.png", full_page=True)
             print("Volunteer Summary heading not found.")
             return
 
-        # Find the table immediately after the heading
-        volunteer_table = await page.query_selector("h3#volunteer-summary + table")
+        # Find the parent div of the heading and then the table inside
+        parent = await heading.evaluate_handle('node => node.parentElement')
+        volunteer_table = await parent.query_selector('table')
         if not volunteer_table:
             await page.screenshot(path="debug-volunteer-table-not-found.png", full_page=True)
             print("Volunteer Summary table not found.")
