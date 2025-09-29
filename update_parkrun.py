@@ -6,9 +6,13 @@ import os
 
 async def main():
     async with async_playwright() as p:
-        # Always use headless=True for CI/server environments
         browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        page = await browser.new_page(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
+        await page.set_extra_http_headers({
+            "Accept-Language": "en-US,en;q=0.9"
+        })
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/")
 
         # Take a screenshot for debugging, even on failure
