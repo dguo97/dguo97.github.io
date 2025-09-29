@@ -8,51 +8,50 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
-
         await page.goto("https://www.parkrun.org.uk/parkrunner/2305995/")
 
-        # Wait for at least one results table
+        # Wait up to 10 seconds for ANY #results table to appear
         try:
-            await page.wait_for_selector("table#results", timeout=15000)
+            await page.wait_for_selector("table#results", timeout=10000)
         except:
-            print("No table#results found")
+            print("No table#results found (timeout).")
             return
 
+        # Find all tables with id="results"
         tables = await page.query_selector_all("table#results")
-        print(f"Found {len(tables)} tables with id='results'.")
+        volunteer_table = None
 
-        volunteer_data = None
-        for idx, table in enumerate(tables):
-            # Find thead th cells
-            thead = await table.query_selector("thead")
-            if not thead:
-                continue
-            headers = await thead.query_selector_all("th")
-            headers_text = [((await h.inner_text()).strip()) for h in headers]
-            print(f"Table {idx} headers: {headers_text}")
-
-            # Look for "Role" and "Occasions"
-            if headers_text == ["Role", "Occasions"]:
-                rows = await table.query_selector_all("tbody tr")
-                volunteer_data = []
-                for row in rows:
-                    cols = await row.query_selector_all("td")
-                    if len(cols) >= 2:
-                        role = (await cols[0].inner_text()).strip()
-                        occasions = int((await cols[1].inner_text()).strip())
-                        volunteer_data.append({"role": role, "occasions": occasions})
-                # Total credits from tfoot
-                tfoot = await table.query_selector("tfoot")
-                if tfoot:
-                    total_cells = await tfoot.query_selector_all("tr td")
-                    if len(total_cells) >= 2:
-                        total_credits = int((await total_cells[1].inner_text()).strip())
-                        volunteer_data.append({"role": "Total Credits", "occasions": total_credits})
+        # Look for table whose header contains "Role" and "Occasions"
+        for table in tables:
+            header = await table.inner_text()
+            if "Role" in header and "Occasions" in header:
+                volunteer_table = table
                 break
 
-        if not volunteer_data:
-            print("No volunteer summary table found.")
+        if not volunteer_table:
+            print("Volunteer Summary table not found.")
             return
+
+        # Extract volunteer data rows
+        volunteer_data = await volunteer_table.eval_on_selector_all(
+            "tbody tr",
+            """rows => rows.map(r => {
+                const cols = r.querySelectorAll("td");
+                return { role: cols[0].innerText.trim(), occasions: parseInt(cols[1].innerText.trim()) || 0 };
+            })"""
+        )
+
+        if not volunteer_data:
+            print("No volunteer data rows found.")
+            return
+
+        # Extract total credits from tfoot if present, else sum
+        total_credits_el = await volunteer_table.query_selector("tfoot tr td:last-child")
+        if total_credits_el:
+            total_credits = int((await total_credits_el.inner_text()).strip())
+        else:
+            total_credits = sum(v['occasions'] for v in volunteer_data)
+        volunteer_data.append({"role": "Total Credits", "occasions": total_credits})
 
         # Save JSON only if data exists
         result = {
@@ -64,6 +63,6 @@ async def main():
         os.makedirs("data", exist_ok=True)
         with open("data/parkrun.json", "w") as f:
             json.dump(result, f, indent=2)
-        print("Volunteer data saved to data/parkrun.json")
+        print("Volunteer data extracted and saved to data/parkrun.json.")
 
 asyncio.run(main())
