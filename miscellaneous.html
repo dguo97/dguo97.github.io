@@ -1,4 +1,3 @@
-
 <style>
 body {
     font-family: 'Arial', sans-serif;
@@ -131,6 +130,23 @@ h2 span {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* Volunteer milestone image tooltip */
+#parkrun-image-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#parkrun-image-tooltip.show {
+    opacity: 1;
+}
+#parkrun-image-tooltip img {
+    width: 240px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
 /* Quote Section */
 .quote-container {
     position: relative;
@@ -241,6 +257,11 @@ h2 span {
         <div id="last-updated"></div>
     </div>
 
+    <!-- Floating image tooltip -->
+    <div id="parkrun-image-tooltip">
+        <img src="https://dguo97.github.io/volunteer_t.jpg" alt="100 Volunteer Milestone">
+    </div>
+
     <!-- Sundays - Woodlands Church -->
     <div class="activity">
         <div class="activity-text">
@@ -288,14 +309,15 @@ h2 span {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// Parkrun volunteer table
+// Parkrun volunteer table + image tooltip
 document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
     const container = document.getElementById('parkrun-table-container');
+    const imageTooltip = document.getElementById('parkrun-image-tooltip');
 
     function renderTable(json) {
-        let total = json.data.reduce((sum,r)=>sum+r.occasions,0);
-        if(!json.data.some(r=>r.role==="Total Credits")) {
-            json.data.push({role:"Total Credits", occasions:total});
+        let total = json.data.reduce((sum, r) => sum + r.occasions, 0);
+        if (!json.data.some(r => r.role === "Total Credits")) {
+            json.data.push({ role: "Total Credits", occasions: total });
         }
 
         let html = '<table><thead><tr><th>Role</th><th>Occasions</th></tr></thead><tbody>';
@@ -313,25 +335,38 @@ document.querySelectorAll('.hover-table-trigger').forEach(trigger => {
             `Last updated: ${day}/${month}/${year}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${hours}:${minutes}`;
     }
 
-    trigger.addEventListener('mouseenter', e=>{
-        container.style.display='block';
-        container.style.top=(e.pageY+10)+'px';
-        container.style.left=(e.pageX+10)+'px';
+    trigger.addEventListener('mouseenter', e => {
+        container.style.display = 'block';
+        imageTooltip.style.display = 'block';
+        imageTooltip.classList.add('show');
+
+        container.style.top = (e.pageY + 10) + 'px';
+        container.style.left = (e.pageX + 10) + 'px';
+        imageTooltip.style.top = (e.pageY - 120) + 'px';
+        imageTooltip.style.left = (e.pageX + 15) + 'px';
+
         fetch('https://dguo97.github.io/data/parkrun.json')
-            .then(res=>res.json()).then(json=>renderTable(json))
-            .catch(err=>{
-                console.warn('Failed to fetch JSON.',err);
-                document.getElementById('table-wrap').innerHTML='<p>Error loading data.</p>';
-                document.getElementById('last-updated').textContent='';
+            .then(res => res.json())
+            .then(json => renderTable(json))
+            .catch(err => {
+                console.warn('Failed to fetch JSON.', err);
+                document.getElementById('table-wrap').innerHTML = '<p>Error loading data.</p>';
+                document.getElementById('last-updated').textContent = '';
             });
     });
 
-    trigger.addEventListener('mousemove', e=>{
-        container.style.top=(e.pageY+10)+'px';
-        container.style.left=(e.pageX+10)+'px';
+    trigger.addEventListener('mousemove', e => {
+        container.style.top = (e.pageY + 10) + 'px';
+        container.style.left = (e.pageX + 10) + 'px';
+        imageTooltip.style.top = (e.pageY - 100) + 'px';
+        imageTooltip.style.left = (e.pageX + 15) + 'px';
     });
 
-    trigger.addEventListener('mouseleave', ()=>{ container.style.display='none'; });
+    trigger.addEventListener('mouseleave', () => {
+        container.style.display = 'none';
+        imageTooltip.classList.remove('show');
+        setTimeout(() => { imageTooltip.style.display = 'none'; }, 300);
+    });
 });
 
 // Quote confetti interaction
