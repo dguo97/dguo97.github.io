@@ -1,6 +1,6 @@
 {
   "source": "parkrun 2305995",
-  "lastUpdated": "2025-11-01 12:15:36 UTC",
+  "lastUpdated": "2025-11-02 12:28:55 UTC",
   "data": [
     {
       "role": "Timekeeper",
@@ -8,7 +8,7 @@
     },
     {
       "role": "Token Sorting",
-      "occasions": 22
+      "occasions": 23
     },
     {
       "role": "Marshal",
@@ -24,7 +24,7 @@
     },
     {
       "role": "Finish Tokens",
-      "occasions": 6
+      "occasions": 7
     },
     {
       "role": "Number Checker",
@@ -40,7 +40,7 @@
     },
     {
       "role": "Total Credits",
-      "occasions": 58
+      "occasions": 59
     }
   ]
 }
