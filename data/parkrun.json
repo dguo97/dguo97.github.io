@@ -1,6 +1,6 @@
 {
   "source": "parkrun 2305995",
-  "lastUpdated": "2025-12-13 12:16:53 UTC",
+  "lastUpdated": "2025-12-14 12:32:47 UTC",
   "data": [
     {
       "role": "Timekeeper",
@@ -16,7 +16,7 @@
     },
     {
       "role": "Barcode Scanning",
-      "occasions": 43
+      "occasions": 44
     },
     {
       "role": "Post-event Close Down",
@@ -44,7 +44,7 @@
     },
     {
       "role": "Total Credits",
-      "occasions": 70
+      "occasions": 71
     }
   ]
 }
