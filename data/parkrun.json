@@ -1,6 +1,6 @@
 {
   "source": "parkrun 2305995",
-  "lastUpdated": "2026-01-04 12:34:08 UTC",
+  "lastUpdated": "2026-01-10 12:17:45 UTC",
   "data": [
     {
       "role": "Timekeeper",
@@ -24,7 +24,7 @@
     },
     {
       "role": "Finish Tokens",
-      "occasions": 8
+      "occasions": 9
     },
     {
       "role": "Number Checker",
@@ -44,7 +44,7 @@
     },
     {
       "role": "Total Credits",
-      "occasions": 79
+      "occasions": 80
     }
   ]
 }
