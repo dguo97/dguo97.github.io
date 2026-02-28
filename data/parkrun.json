@@ -1,10 +1,10 @@
 {
   "source": "parkrun 2305995",
-  "lastUpdated": "2026-02-14 12:21:04 UTC",
+  "lastUpdated": "2026-02-28 12:20:38 UTC",
   "data": [
     {
       "role": "Timekeeper",
-      "occasions": 10
+      "occasions": 11
     },
     {
       "role": "Token Sorting",
@@ -16,7 +16,7 @@
     },
     {
       "role": "Barcode Scanning",
-      "occasions": 49
+      "occasions": 51
     },
     {
       "role": "Post-event Close Down",
@@ -24,7 +24,7 @@
     },
     {
       "role": "Finish Tokens",
-      "occasions": 9
+      "occasions": 10
     },
     {
       "role": "Number Checker",
@@ -32,7 +32,7 @@
     },
     {
       "role": "First Timers Welcome",
-      "occasions": 4
+      "occasions": 5
     },
     {
       "role": "Tail Walker",
@@ -44,7 +44,7 @@
     },
     {
       "role": "Total Credits",
-      "occasions": 89
+      "occasions": 93
     }
   ]
 }
