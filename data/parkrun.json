@@ -1,6 +1,6 @@
 {
   "source": "parkrun 2305995",
-  "lastUpdated": "2026-02-28 12:20:38 UTC",
+  "lastUpdated": "2026-03-01 12:40:24 UTC",
   "data": [
     {
       "role": "Timekeeper",
@@ -16,7 +16,7 @@
     },
     {
       "role": "Barcode Scanning",
-      "occasions": 51
+      "occasions": 52
     },
     {
       "role": "Post-event Close Down",
@@ -32,7 +32,7 @@
     },
     {
       "role": "First Timers Welcome",
-      "occasions": 5
+      "occasions": 6
     },
     {
       "role": "Tail Walker",
@@ -44,7 +44,7 @@
     },
     {
       "role": "Total Credits",
-      "occasions": 93
+      "occasions": 94
     }
   ]
 }
