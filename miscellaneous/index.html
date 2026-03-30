@@ -120,64 +120,59 @@
   }
 
   /* Parkrun table styling */
-  #parkrun-table-container table {
+ /* Parkrun table styling */
+#parkrun-table-container table {
     width: 100%;
     border-collapse: collapse;
     font-family: 'Arial', sans-serif;
     margin-top: 10px;
-  }
+}
 
-  #parkrun-table-container th,
-  #parkrun-table-container td {
+#parkrun-table-container th,
+#parkrun-table-container td {
     border: 1px solid #fbc02d;
     padding: 8px 12px;
     text-align: left;
-  }
+}
 
-  #parkrun-table-container th {
-    background-color: #fdd835;
+#parkrun-table-container th {
+    background-color: #fdd835; /* soft yellow header */
     color: #333;
-  }
+}
 
-  #parkrun-table-container tr:nth-child(even) {
-    background-color: #fff8e1;
-  }
+#parkrun-table-container tr:nth-child(even) {
+    background-color: #fff8e1; /* alternating row color */
+}
 
-  #parkrun-table-container tr:hover {
-    background-color: #ffe082;
-  }
+#parkrun-table-container tr:hover {
+    background-color: #ffe082; /* highlight on hover */
+}
 
- #parkrun-table-container table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Arial', sans-serif;
-    margin-top: 10px;
-  }
-
-  #parkrun-table-container th,
-  #parkrun-table-container td {
-    border: 1px solid #fbc02d;
-    padding: 8px 12px;
-    text-align: left;
-  }
-
-  #parkrun-table-container th {
-    background-color: #fdd835;
-    color: #333;
-  }
-
-  #parkrun-table-container tr:nth-child(even) {
-    background-color: #fff8e1;
-  }
-
-  #parkrun-table-container tr:hover {
-    background-color: #ffe082;
-  }
-
-  #parkrun-table-container {
+#parkrun-table-container {
+    max-width: 250px; 
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#parkrun-table-container {
+    width: 220px;
+    font-size: 0.75rem;
+    padding: 6px;
+}
+#parkrun-table-container h3 {
+    font-size: 0.8rem;
+    margin: 2px 0;
+}
+#parkrun-table-container table {
+    width: 100%;
+    table-layout: fixed;
+    margin-top: 4px;
+}
+#parkrun-table-container th,
+#parkrun-table-container td {
+    padding: 2px 4px;
+    line-height: 1.1;
+}
 
 
 
