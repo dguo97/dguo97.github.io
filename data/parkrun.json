@@ -1,10 +1,10 @@
 {
   "source": "parkrun 2305995",
-  "lastUpdated": "2026-04-12 12:54:32 UTC",
+  "lastUpdated": "2026-05-02 12:40:46 UTC",
   "data": [
     {
       "role": "Timekeeper",
-      "occasions": 13
+      "occasions": 14
     },
     {
       "role": "Token Sorting",
@@ -12,11 +12,11 @@
     },
     {
       "role": "Marshal",
-      "occasions": 5
+      "occasions": 6
     },
     {
       "role": "Barcode Scanning",
-      "occasions": 59
+      "occasions": 62
     },
     {
       "role": "Post-event Close Down",
@@ -44,7 +44,7 @@
     },
     {
       "role": "Total Credits",
-      "occasions": 105
+      "occasions": 110
     }
   ]
 }
