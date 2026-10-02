@@ -5,34 +5,42 @@ import requests
 from bs4 import BeautifulSoup
 
 URL = "https://www.parkrun.org.uk/parkrunner/2305995/"
+
+# Expanded header set to mimic a standard desktop browser request
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-    "Accept-Language": "en-GB,en;q=0.9",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "en-GB,en;q=0.9,en-US;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Cache-Control": "max-age=0",
 }
 
 def main():
+    session = requests.Session()
     try:
-        response = requests.get(URL, headers=HEADERS, timeout=15)
+        response = session.get(URL, headers=HEADERS, timeout=15)
         response.raise_for_status()
     except Exception as e:
         print(f"HTTP request failed: {e}")
         return
 
-    # Check for Cloudflare challenge string
     if "Let's confirm you are human" in response.text:
         print("Cloudflare verification challenge encountered.")
         return
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # Locate the Volunteer Summary heading
     heading = soup.find("h3", id="volunteer-summary")
     if not heading:
         print("Volunteer Summary heading not found.")
         return
 
-    # Locate table within parent container
     parent = heading.parent
     volunteer_table = parent.find("table") if parent else None
     if not volunteer_table:
@@ -41,7 +49,6 @@ def main():
 
     volunteer_data = []
 
-    # Extract tbody rows
     tbody = volunteer_table.find("tbody")
     if tbody:
         for row in tbody.find_all("tr"):
@@ -58,7 +65,6 @@ def main():
         print("No volunteer data rows found.")
         return
 
-    # Extract total credits from tfoot or sum
     tfoot_credit = volunteer_table.select_one("tfoot tr td:last-child")
     if tfoot_credit and tfoot_credit.get_text(strip=True).isdigit():
         total_credits = int(tfoot_credit.get_text(strip=True))
