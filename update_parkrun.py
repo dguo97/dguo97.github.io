@@ -8,13 +8,13 @@ TARGET_URL = "https://www.parkrun.org.uk/parkrunner/2305995/"
 SCRAPER_API_KEY = os.environ.get("SCRAPER_API_KEY")
 
 def main():
-    # Route through ScraperAPI if key exists; otherwise fetch directly
     if SCRAPER_API_KEY:
-        print("Using ScraperAPI proxy...")
+        print("Using ScraperAPI proxy (bypassing cache)...")
         payload = {
             "api_key": SCRAPER_API_KEY,
             "url": TARGET_URL,
-            "render": "false",  # Simple HTML request (1 credit per call)
+            "render": "false",
+            "cache": "false",  # Forces ScraperAPI to fetch live HTML
         }
         try:
             response = requests.get("https://api.scraperapi.com/", params=payload, timeout=30)
@@ -35,21 +35,24 @@ def main():
             print(f"Direct request failed: {e}")
             return
 
-    if "Let's confirm you are human" in response.text:
-        print("Cloudflare verification challenge encountered.")
-        return
-
     soup = BeautifulSoup(response.text, "html.parser")
 
+    # Locate the volunteer table (try ID heading first, fallback to table headers)
     heading = soup.find("h3", id="volunteer-summary")
-    if not heading:
-        print("Volunteer Summary heading not found.")
-        return
+    volunteer_table = None
 
-    parent = heading.parent
-    volunteer_table = parent.find("table") if parent else None
+    if heading and heading.parent:
+        volunteer_table = heading.parent.find("table")
+
     if not volunteer_table:
-        print("Volunteer Summary table not found.")
+        # Fallback: Find table containing "Volunteer Summary" or role columns
+        for table in soup.find_all("table"):
+            if "Volunteer Summary" in table.get_text() or "Role" in table.get_text():
+                volunteer_table = table
+                break
+
+    if not volunteer_table:
+        print("Error: Volunteer Summary table could not be found in the response HTML.")
         return
 
     volunteer_data = []
@@ -66,7 +69,7 @@ def main():
                 volunteer_data.append({"role": role, "occasions": occasions})
 
     if not volunteer_data:
-        print("No volunteer data rows found.")
+        print("Error: Table found but zero data rows parsed.")
         return
 
     tfoot_credit = volunteer_table.select_one("tfoot tr td:last-child")
