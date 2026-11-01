@@ -84,6 +84,24 @@
   }
 }
 
+.talk-list__item {
+  margin-bottom: 1.25em;
+}
+
+.talk-list__item .archive__item {
+  display: flex;
+}
+
+.talk-list__number {
+  flex: 0 0 2.5em;
+  margin: 0;
+}
+
+.talk-list__details {
+  margin: 0;
+  line-height: 1.5;
+}
+
 
 /*
    List view

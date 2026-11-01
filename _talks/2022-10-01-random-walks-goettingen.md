@@ -1,5 +1,7 @@
 ---
 title: "Random walks on vertex-transitive graphs with moderate growth"
+event: "Random Walks and Related Random Topics"
+institution: "University of Göttingen"
 collection: talks
 type: "Seminar"
 permalink: /talks/2022-10-01-random-walks-goettingen
