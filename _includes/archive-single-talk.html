@@ -1,17 +1,7 @@
 {% include base_path %}
 
-<div class="talk-list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
-    <p class="talk-list__number">[{{ forloop.index }}]</p>
-    <div class="talk-list__details">
-      <strong itemprop="name">{{ post.event | default: post.venue }}</strong><br>
-      <em itemprop="headline">{{ post.title }}</em><br>
-      {{ post.institution | default: post.location }}<br>
-      {% if post.date_display %}
-        {{ post.date_display }}
-      {% elsif post.date %}
-        {{ post.date | date: '%B %Y' }}
-      {% endif %}
-    </div>
-  </article>
-</div>
+<li class="talk-list__item" itemscope itemtype="http://schema.org/CreativeWork">
+  <strong itemprop="name">{{ post.event | default: post.venue }}</strong>
+  - <em itemprop="headline">"{{ post.title }}"</em>
+  - {{ post.institution | default: post.location }}
+</li>
