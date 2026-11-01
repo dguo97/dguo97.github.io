@@ -2,6 +2,7 @@
 title: "The conjugacy ratio of abelian-by-cyclic groups"
 event: "Semigroups Seminar"
 institution: "University of Manchester"
+country: "UK"
 collection: talks
 type: "Seminar"
 permalink: /talks/2025-02-01-conjugacy-ratio-manchester

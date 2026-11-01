@@ -2,7 +2,11 @@
 
 <li class="talk-list__item" itemscope itemtype="http://schema.org/CreativeWork">
   <strong itemprop="name">{{ post.event | default: post.venue }}</strong>
-  - <em itemprop="headline">"{{ post.title }}"</em>
-  - {{ post.institution | default: post.location }}
-  - {% if post.date_display %}{{ post.date_display }}{% elsif post.date %}{{ post.date | date: '%B %Y' }}{% endif %}
+  <br>
+  <em itemprop="headline">"{{ post.title }}"</em>
+  <br>
+  {{ post.institution | default: post.location }}{% if post.country %}, {{ post.country }}{% endif %}
+  {% if post.date_display or post.date %}<br>
+    {% if post.date_display %}{{ post.date_display }}{% else %}{{ post.date | date: '%B %Y' }}{% endif %}
+  {% endif %}
 </li>

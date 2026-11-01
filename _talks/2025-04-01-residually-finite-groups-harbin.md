@@ -2,6 +2,7 @@
 title: "Residually finite groups with uniformly almost flat quotients"
 event: "Geometric Group Theory Seminar"
 institution: "Harbin Institute of Technology"
+country: "China"
 collection: talks
 type: "Seminar"
 permalink: /talks/2025-04-01-residually-finite-groups-harbin

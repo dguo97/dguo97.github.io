@@ -2,6 +2,7 @@
 title: "Residually finite groups with uniformly almost flat quotients"
 event: "Combinatorics Seminar"
 institution: "University of Bristol"
+country: "UK"
 collection: talks
 type: "Seminar"
 permalink: /talks/2024-10-01-residually-finite-groups-bristol

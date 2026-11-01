@@ -2,6 +2,7 @@
 title: "Uniformly almost flat coset spaces in polycyclic groups"
 event: "Bristol Junior Geometry Seminar"
 institution: "University of Bristol"
+country: "UK"
 collection: talks
 type: "Seminar"
 permalink: /talks/2023-05-01-uniformly-almost-flat-coset-space-bristol

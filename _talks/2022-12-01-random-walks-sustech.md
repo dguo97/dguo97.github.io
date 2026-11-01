@@ -2,6 +2,7 @@
 title: "Random walks on vertex-transitive graphs with moderate growth"
 event: "Seminars on Groups and Graphs"
 institution: "SUSTech (online)"
+country: "China"
 collection: talks
 type: "Seminar"
 permalink: /talks/2022-12-01-random-walks-sustech
